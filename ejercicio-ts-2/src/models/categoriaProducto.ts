@@ -1,0 +1,1 @@
+export type categoria_producto = "Ropa" | "Deportes"| "Alimentos";
