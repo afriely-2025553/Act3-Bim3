@@ -7,7 +7,7 @@ import { Tipo_cliente } from "../models/tipoDeCliente ";
 import { categoria_producto } from "../models/categoriaProducto";
 import { calcularIVAporId } from "../service/productoService";
 
-export function menu(): void {
+export async function menu() {
 
     console.log("|-------------------------------|")
     console.log("|-------      MENU      --------|")
@@ -24,141 +24,118 @@ export function menu(): void {
     console.log("|-----0. salir              ----|")
     console.log("|-------------------------------|")
 
-    rl.question("Seleccione una opción: ", (opcion) => {
+    let opcion = await  rl.question("Seleccione una opción: ") ;
 
         switch(opcion){
 
    case "1":
+    let id_producto = await rl.question("Ingrese el id del producto: ");
+    let nombre_producto = await rl.question("Ingrese el nombre del producto: ");
+    let descripcion_producto = await rl.question("Ingrese la descripción del producto: ");
+    let precio_producto = Number(await rl.question("Ingrese el precio del producto: "));
+    let categoria_producto = await rl.question("Ingrese la categoría del producto (Ropa, Deportes, Alimentos): ");
 
-    rl.question("ID: ", (id) => {
+    await agregarProducto(
+        Number(id_producto),
+        nombre_producto,
+        descripcion_producto,
+        precio_producto,
+        categoria_producto as categoria_producto
+    );
 
-        rl.question("Nombre: ", (nombre) => {
-
-            rl.question("Descripción: ", (descripcion) => {
-
-                rl.question("Precio: ", (precio) => {
-
-                    rl.question("Categoria (Ropa, Deportes, Alimentos): ", (categoria) => {
-
-                        agregarProducto(
-                            Number(id),
-                            nombre,
-                            descripcion,
-                            Number(precio),
-                            categoria
-                        );
-
-                        menu();
-                    });
-
-                });
-
-            });
-
-        });
-
-    });
-
+    menu();
     break;
     case "2":
-        rl.question("ID del producto a eliminar: ", (id) => {
-            eliminarProducto(Number(id));
-            menu();
-        });
-        break; 
+       let id_producto_eliminar = await rl.question("Ingrese el id del producto que desea eliminar: ");
+        eliminarProducto(Number(id_producto_eliminar));
+        menu();
+        break;
     case "3":
-        rl.question("ID del producto a actualizar: ", (id) => {
-            rl.question("Nuevo nombre: ", (nombre) => {
-                rl.question("Nueva descripción: ", (descripcion) => {
-                    rl.question("Nuevo precio: ", (precio) => {
-                        rl.question("Nueva categoría: ", (categoria) => {
-                            actualizarProducto(
-                                Number(id),
-                                {
-                                    id_producto: Number(id),
-                                    nombre_producto: nombre,
-                                    descripcion_producto: descripcion,
-                                    precio_producto: Number(precio),
-                                    categoria_producto: categoria as any
-                                }
-                            );
-                            menu();
-                        });
-                    });
-                });
-            });
-        });
+        let id_producto_actualizar = await rl.question("Ingrese el id del producto a actualizar: ");
+        let nombre_producto_actualizar = await rl.question("Ingrese el nuevo nombre del producto: ");
+        let descripcion_producto_actualizar = await rl.question("Ingrese la nueva descripción del producto: ");
+        let precio_producto_actualizar = Number(await rl.question("Ingrese el nuevo precio del producto: "));
+        let categoria_producto_actualizar = await rl.question("Ingrese la nueva categoría del producto (Ropa, Deportes, Alimentos): ");
+
+        let producto: Producto = {
+            id_producto: Number(id_producto_actualizar),
+            nombre_producto: nombre_producto_actualizar,
+            descripcion_producto: descripcion_producto_actualizar,
+            precio_producto: precio_producto_actualizar,
+            categoria_producto: categoria_producto_actualizar as categoria_producto
+        };
+        await actualizarProducto(
+            Number(id_producto_actualizar), producto
+        );
+        menu();
         break;
     case "4":
         console.table(listarProductos());
         menu();
         break;
     case "5":
-        rl.question("ID del producto para calcular IVA: ", (id) => {
-            const iva = calcularIVAporId(Number(id));
-            console.log(`IVA para el producto con ID ${id}: ${iva}`);
-            menu();
-        });
-        break;
+        let id_producto_iva = await rl.question("Ingrese el id del producto para calcular el IVA: ");
+        let iva = calcularIVAporId(Number(id_producto_iva));
+        if (iva !== null) {
+            console.log(`El IVA del producto con id ${id_producto_iva} es: ${iva}`);
+        } else {
+            console.log(`No se encontró un producto con id ${id_producto_iva}`);
+        }
+        menu();
+
 
     case "6":
-        rl.question("ID: ", (id) => {
-            rl.question("DPI: ", (dpi) => {
-                rl.question("Nombre: ", (nombre) => {
-                    rl.question("Apellido: ", (apellido) => {
-                        rl.question("Email: ", (email) => {
-                            rl.question("Teléfono: ", (telefono) => {
-                                rl.question("Tipo (1: Normal, 2: Premium): ", (tipo) => {
-                                    agregarCliente(
-                                        Number(id),
-                                        Number(dpi),
-                                        nombre,
-                                        apellido,
-                                        email,
-                                        telefono,
-                                        Number(tipo)
-                                    );
-                                    menu();
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
+       let id_cliente = await rl.question("Ingrese el id del cliente: ");
+        let dpi_cliente = await rl.question("Ingrese el DPI del cliente: ");
+        let nombre_cliente = await rl.question("Ingrese el nombre del cliente: ");
+        let apellido_cliente = await rl.question("Ingrese el apellido del cliente: ");
+        let email_cliente = await rl.question("Ingrese el email del cliente: ");
+        let telefono_cliente = await rl.question("Ingrese el teléfono del cliente: ");
+        let tipo_cliente = await rl.question("Ingrese el tipo de cliente (1: Normal, 2: Premium): ");
+
+        await agregarCliente(
+            Number(id_cliente),
+            Number(dpi_cliente),
+            nombre_cliente,
+            apellido_cliente,
+            email_cliente,
+            telefono_cliente,
+            Number(tipo_cliente)
+        );
+
+
+        menu();
         break;
+
     case "7":
-        rl.question("ID del cliente a eliminar: ", (id) => {
-            eliminarCliente(Number(id));
-            menu();
-        });
+        let id_cliente_eliminar = await rl.question("Ingrese el id del cliente que desea eliminar: ");
+        eliminarCliente(Number(id_cliente_eliminar));
+        menu();
         break;
     case "8":
-        rl.question("ID del cliente a actualizar: ", (id) => {
-            rl.question("Nuevo nombre: ", (nombre) => {
-                rl.question("Nuevo apellido: ", (apellido) => {
-                    rl.question("Nuevo email: ", (email) => {
-                        rl.question("Nuevo teléfono: ", (telefono) => {
-                            rl.question("Nuevo tipo (1: Normal, 2: Premium): ", (tipo) => {
-                                actualizarCliente(
-                                    Number(id),
-                                    {
-                                        id_cliente: Number(id),
-                                        dpi_cliente: Number(id),
-                                        nombre_cliente: nombre,
-                                        apellido_cliente: apellido,
-                                        email_cliente: email,
-                                        telefono_cliente: telefono,
-                                        tipo_cliente: Number(tipo) as any
-                                    }
-                                );
-                                menu();
-                            });
-                        });
-                    });
-                });
-            });
-        });
+        let id_cliente_actualizar = await rl.question("Ingrese el id del cliente a actualizar: ");
+        let dpi_cliente_actualizar = await rl.question("Ingrese el nuevo DPI del cliente: ");
+        let nombre_cliente_actualizar = await rl.question("Ingrese el nuevo nombre del cliente: ");
+        let apellido_cliente_actualizar = await rl.question("Ingrese el nuevo apellido del cliente: ");
+        let email_cliente_actualizar = await rl.question("Ingrese el nuevo email del cliente: ");
+        let telefono_cliente_actualizar = await rl.question("Ingrese el nuevo teléfono del cliente: ");
+        let tipo_cliente_actualizar = await rl.question("Ingrese el nuevo tipo de cliente (1: Normal, 2: Premium): ");
+
+        let cliente: Cliente = {
+            id_cliente: Number(id_cliente_actualizar),
+            dpi_cliente: Number(dpi_cliente_actualizar),
+            nombre_cliente: nombre_cliente_actualizar,
+            apellido_cliente: apellido_cliente_actualizar,
+            email_cliente: email_cliente_actualizar,
+            telefono_cliente: telefono_cliente_actualizar,
+            tipo_cliente: tipo_cliente_actualizar === "1" ? Tipo_cliente.NORMAL : Tipo_cliente.PREMIUM
+        };
+
+        await actualizarCliente(
+            Number(id_cliente_actualizar), cliente
+        );
+
+        menu();
         break;
 
     case "9":
@@ -174,5 +151,4 @@ export function menu(): void {
         menu();
 }
 
-    });
-}
+    };
